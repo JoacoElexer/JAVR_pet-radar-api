@@ -43,7 +43,7 @@ export class NotificationsService {
                 </div>
 
                 <p>Ubicación del encuentro (Pin Rojo):</p>
-                <img src="${mapUrl}" alt="Mapa" style="width: 100%; border-radius: 5px;"/>
+                <img src="${mapUrl}" alt="Mapa" style="width: 75%; border-radius: 5px;"/>
                 
                 <p style="margin-top: 20px;">Por favor, contacta al buscador lo antes posible para confirmar si se trata de tu mascota.</p>
                 <p>Atentamente,<br>El equipo de PetRadar</p>
