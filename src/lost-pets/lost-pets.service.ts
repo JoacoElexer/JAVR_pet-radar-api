@@ -22,7 +22,11 @@ export class LostPetsService {
       ...rest,
       location: location as any,
     })
-    return await this.lostPetRepository.save(newLostPet);
+    const savedPet = await this.lostPetRepository.save(newLostPet);
+    return {
+      message: 'Mascota perdida registrada con éxito',
+      pet: savedPet,
+    }
   }
 
   findAll() {

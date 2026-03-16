@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 
 export class CreateFoundPetDto {
@@ -35,10 +35,10 @@ export class CreateFoundPetDto {
     @IsString()
     @IsNotEmpty()
     found_date: string;
-    @IsString()
+    @IsNumber()
     @IsNotEmpty()
-    latitude: string;
-    @IsString()
+    latitude: number;
+    @IsNumber()
     @IsNotEmpty()
-    longitude: string;
+    longitude: number;
 }
