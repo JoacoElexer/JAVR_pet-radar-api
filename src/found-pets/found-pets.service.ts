@@ -8,6 +8,7 @@ import { LostPet } from 'src/lost-pets/entities/lost-pet.entity';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
+import { TelemetryService } from 'src/telemetry.service';
 
 const FOUND_PETS_CACHE_KEY = 'found_pets_all';
 
@@ -22,9 +23,11 @@ export class FoundPetsService {
 
     private readonly notificationsService: NotificationsService,
 
+    private readonly telemetryService: TelemetryService,
+
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-  ) {}
+  ) { }
 
   async create(createFoundPetDto: CreateFoundPetDto) {
     const { latitude, longitude, ...rest } = createFoundPetDto;
@@ -62,10 +65,15 @@ export class FoundPetsService {
     );
 
     if (matches.length > 0) {
+      this.telemetryService.trackEvent('PetMatchFound', {
+        foundPetSpecies: rest.species,
+        matchCount: String(matches.length),
+        coordinates: `${longitude},${latitude}`,
+      });
+
       for (const match of matches) {
         try {
-          await this.notificationsService.sendMatchNotification(
-            match.owner_email,
+          await this.notificationsService.sendMatchNotification(match.owner_email,
             match.owner_name,
             match.name,
             [longitude, latitude],
@@ -79,14 +87,14 @@ export class FoundPetsService {
               breed: rest.breed,
               color: rest.color,
               size: rest.size,
-            },
-          );
+            });
           console.log(`Notificacion enviada a: ${match.owner_email}`);
         } catch (error) {
-          console.error(
-            `Error al enviar el correo ${match.owner_email}:`,
-            error,
-          );
+          this.telemetryService.trackException(error as Error, {
+            context: 'sendMatchNotification',
+            ownerEmail: match.owner_email,
+          });
+          console.error(`Error al enviar el correo ${match.owner_email}:`, error);
         }
       }
     }

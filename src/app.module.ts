@@ -8,8 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { NotificationsService } from './notifications/notifications.service';
 import { CacheModule } from '@nestjs/cache-manager';
-import KeyvRedis from '@keyv/redis';
-import Keyv from 'keyv';
+import { createKeyv } from '@keyv/redis';
 import { TelemetryService } from './telemetry.service';
 
 @Module({
@@ -18,19 +17,15 @@ import { TelemetryService } from './telemetry.service';
       isGlobal: true,
     }),
     CacheModule.registerAsync({
-  isGlobal: true,
-  useFactory: (config: ConfigService) => ({
-    stores: [
-      new Keyv({
-        store: new KeyvRedis(
-          config.get<string>('REDIS_URL', 'redis://localhost:6379')
-        ),
+      isGlobal: true,
+      useFactory: (config: ConfigService) => ({
+        stores: [
+          createKeyv(config.get<string>('REDIS_URL', 'redis://localhost:6379')),
+        ],
+        ttl: 60_000,
       }),
-    ],
-    ttl: 60_000,
-  }),
-  inject: [ConfigService],
-}),
+      inject: [ConfigService],
+    }),
     TypeOrmModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
