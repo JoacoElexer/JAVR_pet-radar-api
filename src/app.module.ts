@@ -21,7 +21,9 @@ import { NotificationsService } from './notifications/notifications.service';
       password: 'root',
       database: 'petradar_db',
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: false,
+      migrations: ['dist/migrations/*.js'],
+      migrationsRun: true,
     }),
     MailerModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
